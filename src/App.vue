@@ -1,9 +1,12 @@
 <template>
   <nav>
     <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
+    <router-link to="/login">Login</router-link>
   </nav>
   <router-view/>
+  <footer>
+      <p>Laboratorio 3 - Cursado Intensivo - 2024</p>
+  </footer>
 </template>
 
 <style>
@@ -13,6 +16,10 @@
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+  /* estos 3 son para ver que onda, sino lo borro */
+  min-height: 100vh; /* Asegura que el contenedor ocupe al menos toda la altura de la pantalla */
+  display: flex;
+  flex-direction: column;
 }
 
 nav {
@@ -21,10 +28,41 @@ nav {
 
 nav a {
   font-weight: bold;
-  color: #2c3e50;
+  color: #c22b17;
 }
 
 nav a.router-link-exact-active {
-  color: #42b983;
+  color: #120a8a;
+}
+footer {
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  padding: 20px 0;
+  font-size: 14px;
+  margin-top: auto; /* Esto empuja el footer al final */
+  width: 100%;
+}  
+footer p {
+  margin: 0;
+  font-size: 15px;
+  color: #bbb;
+}  
+footer a {
+  color: #4A90E2;
+  text-decoration: none;
+  margin: 0 10px;
+  transition: color 0.3s ease;
+}  
+footer a:hover {
+  color: #357ABD;
+}
+section {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  background-color: #e9e9e9;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Sombra suave */
 }
 </style>
