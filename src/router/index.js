@@ -3,6 +3,7 @@ import HomeView from '../views/HomeView.vue'
 import LoginView from '@/views/LoginView.vue'
 import DashboardView from '@/views/DashboardView.vue'
 import HistoryView from '@/views/HistoryView.vue'
+import OperarView from '@/views/OperarView.vue'
 
 const routes = [
   {
@@ -27,6 +28,11 @@ const routes = [
     path: '/history', 
     name: 'History', 
     component: HistoryView
+  },
+  {
+    path: '/operar',
+    name: 'Operar',
+    component: OperarView
   },
 ]
 

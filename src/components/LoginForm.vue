@@ -20,7 +20,7 @@
 <script>
 import { ref } from 'vue'
 import { useUserStore } from '@/stores/userStore'
-import { useRouter } from 'vue-router'// esto nose para que
+import { useRouter } from 'vue-router'
 
 export default {
   setup() {
@@ -35,8 +35,6 @@ export default {
       } else {
         errorMessage.value = ''
 
-        // Aquí es donde deberías realizar la autenticación (ejemplo con datos estáticos)
-        // Ejemplo de datos del usuario
         const userData = { userName: userStore.userName, password: password.value }
         const token = 'algun_token_aca'; // Este token vendría de tu API tras autenticar al usuario
         

@@ -1,13 +1,35 @@
 <template>
   <nav>
     <router-link to="/">Home</router-link> |
-    <router-link to="/login">Login</router-link>
+    <router-link v-if="!isLoggedIn" to="/login">Login</router-link>
+    <router-link v-if="isLoggedIn" to="/dashboard">Dashboard</router-link> |
+    <router-link v-if="isLoggedIn" to="/operar">Operar</router-link> |
+    <a v-if="isLoggedIn" @click="logout">Logout</a>
   </nav>
   <router-view/>
   <footer>
       <p>Laboratorio 3 - Cursado Intensivo - 2024</p>
   </footer>
 </template>
+
+<script>
+import { useUserStore } from '@/stores/userStore';
+import { computed } from 'vue';
+
+export default {
+  setup() {
+    const userStore = useUserStore();
+    const isLoggedIn = computed(() => !!userStore.userName);
+
+    const logout = () => {
+      userStore.logout();
+      window.location.href = '/';
+    };
+
+    return { isLoggedIn, logout };
+  },
+};
+</script>
 
 <style>
 #app {
@@ -29,6 +51,7 @@ nav {
 nav a {
   font-weight: bold;
   color: #c22b17;
+  cursor: pointer; /* Add cursor pointer for logout link */
 }
 
 nav a.router-link-exact-active {

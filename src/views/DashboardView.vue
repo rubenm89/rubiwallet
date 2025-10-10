@@ -1,6 +1,5 @@
 <template>
-    <div class="dashboard">
-      <!--<h1>Bienvenido, {{ userName }}</h1>  -->
+    <div class="dashboard">     
       <h1>Bienvenido, <p v-if="userStore.userName">{{ userStore.userName }}</p>
         <p v-else>visitante</p></h1>    
       <DashboardStats />
