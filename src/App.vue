@@ -4,6 +4,7 @@
     <router-link v-if="!isLoggedIn" to="/login">Login</router-link>
     <router-link v-if="isLoggedIn" to="/dashboard">Dashboard</router-link> |
     <router-link v-if="isLoggedIn" to="/operar">Operar</router-link> |
+    <router-link v-if="isLoggedIn" to="/analysis">Análisis</router-link> |
     <a v-if="isLoggedIn" @click="logout">Logout</a>
   </nav>
   <router-view/>

@@ -5,6 +5,7 @@ import DashboardView from '@/views/DashboardView.vue'
 import HistoryView from '@/views/HistoryView.vue'
 import OperarView from '@/views/OperarView.vue'
 import EditTransactionView from '@/views/EditTransactionView.vue'
+import AnalysisView from '@/views/AnalysisView.vue'
 
 const routes = [
   {
@@ -39,6 +40,11 @@ const routes = [
     path: '/edit/:id',
     name: 'EditTransaction',
     component: EditTransactionView
+  },
+  {
+    path: '/analysis',
+    name: 'Analysis',
+    component: AnalysisView
   },
 ]
 

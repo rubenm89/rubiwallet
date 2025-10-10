@@ -4,21 +4,25 @@
     <table v-if="hasCrypto">
       <thead>
         <tr>
+          <th class="logo-col"></th>
           <th>Criptomoneda</th>
           <th>Cantidad</th>
-          <th>Valor Actual (ARS)</th>
+          <th>Precio Unitario (ARS)</th>
+          <th>Valor Total (ARS)</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="(cantidad, cripto) in userCrypto" :key="cripto">
+          <td><img :src="cryptoLogos[cripto]" :alt="cripto" class="crypto-logo"></td>
           <td>{{ cripto.charAt(0).toUpperCase() + cripto.slice(1) }}</td>
           <td>{{ cantidad.toFixed(6) }}</td>
+          <td>${{ (prices[cripto]?.bid || 0).toFixed(2) }}</td>
           <td>${{ (cantidad * (prices[cripto]?.bid || 0)).toFixed(2) }}</td>
         </tr>
       </tbody>
       <tfoot>
         <tr>
-          <th colspan="2">Valor Total</th>
+          <th colspan="4">Valor Total del Portafolio</th>
           <th>${{ totalPortfolioValue.toFixed(2) }}</th>
         </tr>
       </tfoot>
@@ -53,6 +57,13 @@ export default {
         const price = this.prices[crypto]?.bid || 0;
         return total + (amount * price);
       }, 0);
+    },
+    cryptoLogos() {
+      return {
+        btc: require('@/assets/bitcoin-logo.png'),
+        eth: require('@/assets/ethereum-logo.png'),
+        ltc: require('@/assets/litecoin-logo.png'),
+      };
     },
   },
   methods: {
@@ -105,7 +116,7 @@ export default {
 
 table {
   margin: auto;
-  width: 80%;
+  width: 90%;
   border-collapse: collapse;
 }
 
@@ -113,6 +124,7 @@ th, td {
   border: 1px solid #ddd;
   padding: 12px;
   text-align: center;
+  vertical-align: middle;
 }
 
 th {
@@ -125,5 +137,14 @@ tfoot {
 
 tfoot th {
   text-align: right;
+}
+
+.crypto-logo {
+  width: 24px;
+  height: 24px;
+}
+
+.logo-col {
+  width: 40px;
 }
 </style>
