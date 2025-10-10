@@ -4,6 +4,7 @@ import LoginView from '@/views/LoginView.vue'
 import DashboardView from '@/views/DashboardView.vue'
 import HistoryView from '@/views/HistoryView.vue'
 import OperarView from '@/views/OperarView.vue'
+import EditTransactionView from '@/views/EditTransactionView.vue'
 
 const routes = [
   {
@@ -33,6 +34,11 @@ const routes = [
     path: '/operar',
     name: 'Operar',
     component: OperarView
+  },
+  {
+    path: '/edit/:id',
+    name: 'EditTransaction',
+    component: EditTransactionView
   },
 ]
 
