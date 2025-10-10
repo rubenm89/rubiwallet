@@ -6,14 +6,22 @@
         <tr>
           <th>Criptomoneda</th>
           <th>Cantidad</th>
+          <th>Valor Actual (ARS)</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="(cantidad, cripto) in userCrypto" :key="cripto">
           <td>{{ cripto.charAt(0).toUpperCase() + cripto.slice(1) }}</td>
           <td>{{ cantidad.toFixed(6) }}</td>
+          <td>${{ (cantidad * (prices[cripto]?.bid || 0)).toFixed(2) }}</td>
         </tr>
       </tbody>
+      <tfoot>
+        <tr>
+          <th colspan="2">Valor Total</th>
+          <th>${{ totalPortfolioValue.toFixed(2) }}</th>
+        </tr>
+      </tfoot>
     </table>
     <p v-else>No tienes criptomonedas en tu portafolio.</p>
   </section>
@@ -25,6 +33,12 @@ import { useUserStore } from '@/stores/userStore';
 
 export default {
   name: 'UserPortfolio',
+  props: {
+    prices: {
+      type: Object,
+      required: true,
+    },
+  },
   data() {
     return {
       userCrypto: {},
@@ -33,6 +47,12 @@ export default {
   computed: {
     hasCrypto() {
       return Object.keys(this.userCrypto).length > 0;
+    },
+    totalPortfolioValue() {
+      return Object.entries(this.userCrypto).reduce((total, [crypto, amount]) => {
+        const price = this.prices[crypto]?.bid || 0;
+        return total + (amount * price);
+      }, 0);
     },
   },
   methods: {
@@ -78,22 +98,32 @@ export default {
 </script>
 
 <style scoped>
-.user-portfolio {
-  /* Styles for this component can go here */
+.user-portfolio h2 {
+  text-align: center;
+  margin-bottom: 1rem;
 }
 
 table {
   margin: auto;
-  width: 50%;
+  width: 80%;
   border-collapse: collapse;
 }
 
 th, td {
   border: 1px solid #ddd;
-  padding: 8px;
+  padding: 12px;
+  text-align: center;
 }
 
 th {
   background-color: #f2f2f2;
+}
+
+tfoot {
+  font-weight: bold;
+}
+
+tfoot th {
+  text-align: right;
 }
 </style>

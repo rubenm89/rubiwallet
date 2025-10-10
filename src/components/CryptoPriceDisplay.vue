@@ -15,14 +15,17 @@
 </template>
 
 <script>
-import { getCryptoPrice } from '../service/axios';
-
 export default {
   name: 'CryptoPriceDisplay',
+  props: {
+    prices: {
+      type: Object,
+      required: true,
+    },
+  },
   data() {
     return {
       availableCryptos: ["btc", "eth", "ltc"],
-      prices: {},
     };
   },
   computed: {
@@ -33,27 +36,6 @@ export default {
         ltc: require('@/assets/litecoin-logo.png'),
       };
     },
-  },
-  methods: {
-    async fetchCryptoPrices() {
-      try {
-        const prices = {};
-        for (const crypto of this.availableCryptos) {
-          const data = await getCryptoPrice("binance", crypto, "ars", 1);
-          prices[crypto] = {
-            ask: data.ask, // Precio de compra
-            bid: data.bid, // Precio de venta
-          };
-        }
-        this.prices = prices;
-      } catch (error) {
-        console.error("Error al obtener los precios de las criptomonedas:", error);
-      }
-    },
-  },
-  mounted() {
-    this.fetchCryptoPrices();   
-    setInterval(this.fetchCryptoPrices, 30000);
   },
 };
 </script>
