@@ -1,7 +1,7 @@
 <template>
   <div class="dashboard-stats">
-    <CryptoPriceDisplay />
-    <UserPortfolio />
+    <CryptoPriceDisplay :prices="prices" />
+    <UserPortfolio :prices="prices" />
 
     <section class="actions">
       <h2>Acciones</h2>
@@ -14,6 +14,7 @@
 </template>
 
 <script>
+import { getCryptoPrice } from '../service/axios';
 import CryptoPriceDisplay from './CryptoPriceDisplay.vue';
 import UserPortfolio from './UserPortfolio.vue';
 
@@ -22,6 +23,11 @@ export default {
     CryptoPriceDisplay,
     UserPortfolio,
   },
+  data() {
+    return {
+      prices: {},
+    };
+  },
   methods: {
     goToHistory() {
       this.$router.push("/history");
@@ -29,6 +35,26 @@ export default {
     goToOperar() {
       this.$router.push("/operar");
     },
+    async fetchCryptoPrices() {
+      try {
+        const availableCryptos = ["btc", "eth", "ltc"];
+        const prices = {};
+        for (const crypto of availableCryptos) {
+          const data = await getCryptoPrice("binance", crypto, "ars", 1);
+          prices[crypto] = {
+            ask: data.ask,
+            bid: data.bid,
+          };
+        }
+        this.prices = prices;
+      } catch (error) {
+        console.error("Error al obtener los precios de las criptomonedas:", error);
+      }
+    },
+  },
+  mounted() {
+    this.fetchCryptoPrices();
+    setInterval(this.fetchCryptoPrices, 30000);
   },
 };
 </script>
