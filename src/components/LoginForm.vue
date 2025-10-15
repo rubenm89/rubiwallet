@@ -3,7 +3,7 @@
     <form @submit.prevent="handleSubmit">
       <div>
           <label for="userName">Usuario: </label>
-          <input type="text" id="userName" v-model="userStore.userName" placeholder="Ingresa tu usuario" required />          
+          <input type="text" id="userName" v-model="userName" placeholder="Ingresa tu usuario" required />          
       </div>
 
       <div>
@@ -25,30 +25,24 @@ import { useRouter } from 'vue-router'
 export default {
   setup() {
     const userStore = useUserStore()
-    const router = useRouter() 
+    const router = useRouter()
+    const userName = ref('')
     const password = ref('')
     const errorMessage = ref('')
 
     const handleSubmit = () => {
-        if (!userStore.userName || !password.value) {
+        if (!userName.value || !password.value) {
         errorMessage.value = 'Por favor, completa ambos campos.'
       } else {
         errorMessage.value = ''
-
-        const userData = { userName: userStore.userName, password: password.value }
-        const token = 'algun_token_aca'; // Este token vendría de tu API tras autenticar al usuario
+       
+        userStore.login(userName.value)
         
-        // Llamamos al método de login de la store (almacenando usuario y token)
-        userStore.login(userData, token) // Guarda el usuario en Pinia
-        console.log('Usuario:', userStore.userName) // Sacar después        
-        console.log('Contraseña:', password.value) // Sacar después
-        console.log('en el userData hay:', userData)
-        
-        router.push('/dashboard') // Redirige al dashboard
+        router.push('/dashboard') 
       }
     }
 
-    return { userStore, password, errorMessage, handleSubmit }
+    return { userName, password, errorMessage, handleSubmit }
   }
 }
 </script>

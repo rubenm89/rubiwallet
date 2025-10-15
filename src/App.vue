@@ -1,11 +1,10 @@
 <template>
-  <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link v-if="!isLoggedIn" to="/login">Login</router-link>
-    <router-link v-if="isLoggedIn" to="/dashboard">Dashboard</router-link> |
-    <router-link v-if="isLoggedIn" to="/operar">Operar</router-link> |
-    <router-link v-if="isLoggedIn" to="/analysis">Análisis</router-link> |
-    <a v-if="isLoggedIn" @click="logout">Logout</a>
+  <nav v-if="showNav">
+    <router-link to="/dashboard">Dashboard</router-link> |
+    <router-link to="/operar">Operar</router-link> |
+    <router-link to="/history">Historial</router-link> |
+    <router-link to="/analysis">Análisis</router-link> |
+    <a @click="logout">Logout</a>
   </nav>
   <router-view/>
   <footer>
@@ -16,18 +15,26 @@
 <script>
 import { useUserStore } from '@/stores/userStore';
 import { computed } from 'vue';
+import { useRoute } from 'vue-router';
 
 export default {
   setup() {
     const userStore = useUserStore();
+    const route = useRoute();
+
     const isLoggedIn = computed(() => !!userStore.userName);
+
+    const showNav = computed(() => {
+      const hiddenRoutes = ['home', 'login', 'about'];
+      return isLoggedIn.value && !hiddenRoutes.includes(route.name);
+    });
 
     const logout = () => {
       userStore.logout();
       window.location.href = '/';
     };
 
-    return { isLoggedIn, logout };
+    return { isLoggedIn, showNav, logout };
   },
 };
 </script>
