@@ -1,15 +1,11 @@
 <template>
   <section>
     <form @submit.prevent="handleSubmit">
-      <div>
-          <label for="userName">Usuario: </label>
-          <input type="text" id="userName" v-model="userName" placeholder="Ingresa tu usuario" required />          
-      </div>
+      <label for="userName">Usuario</label>
+      <input type="text" id="userName" v-model="userName" placeholder="Ingresa tu usuario" required />
 
-      <div>
       <label for="password">Contraseña</label>
       <input type="password" id="password" v-model="password" placeholder="Ingrese su contraseña" required/>
-      </div>
       
       <button type="submit">Ingresar</button>
       <p v-show="errorMessage" style="color: red">{{ errorMessage }}</p>
@@ -49,23 +45,37 @@ export default {
 
 <style scoped>
 form {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: auto 1fr;
   gap: 10px;
   max-width: 300px;
   margin: auto;
+  align-items: center;
+}
+label {
+  text-align: left;
 }
 input {
   padding: 5px;
   font-size: 14px;
+  width: 100%;
+  box-sizing: border-box;
 }
 button {
+  grid-column: 1 / -1;
   background-color: #007bff;
   color: white;
   padding: 10px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  width: 100%;
+  box-sizing: border-box;
+}
+p[style*="color: red"] {
+  grid-column: 1 / -1;
+  text-align: center;
+  margin: 0;
 }
 button:hover {
   background-color: #0056b3;
