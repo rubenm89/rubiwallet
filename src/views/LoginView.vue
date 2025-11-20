@@ -1,7 +1,7 @@
 <template>
     <div class="login-view">
       <h1>Inicia Sesión</h1>
-      <LoginForm @login="handleLogin" />
+      <LoginForm />
   </div>
 </template>
 
@@ -13,15 +13,6 @@ export default {
   components: {
       LoginForm
   },
-
-  methods:{
-    handleLogin(userId) {
-    console.log("ID ingresado:", userId);
-      // Por ahora, simplemente mostramos el ID en consola.
-      // Más adelante se guardará el ID (por ejemplo, con Pinia o LocalStorage)
-      // Y redirigiremos a otra vista usando `this.$router.push("/dashboard");`
-    },
-  }
 }
 
 </script>

@@ -31,57 +31,54 @@
 </template>
 
 <script>
-import { useUserStore } from '@/stores/userStore';
-import { axiosData } from '../service/axios';
-
-export default {
-  name: 'TransactionHistory',
-  data() {
-    return {
-      transactions: [],
-    };
-  },
-  mounted() {
-    this.fetchTransactions();
-  },
-  methods: {
-    async fetchTransactions() {
-      const userStore = useUserStore();
-      const userId = userStore.userName;
-      if (!userId) {
-        alert("No se pudo identificar al usuario.");
-        return;
-      }
-
-      try {
-        const response = await axiosData.get(`/transactions?q=${JSON.stringify({ user_id: userId })}`);
-        // Sort transactions by date, newest first
-        this.transactions = response.data.sort((a, b) => new Date(b.datetime) - new Date(a.datetime));
-      } catch (error) {
-        console.error("Error al obtener el historial de transacciones:", error);
-        alert("No se pudo cargar el historial.");
-      }
+  import { axiosData } from '@/service/axios';
+  import { mapState } from 'pinia';
+  import { useUserStore } from '@/stores/userStore';
+  
+  export default {
+    name: 'TransactionHistory',
+    data() {
+      return {
+        transactions: [],
+      };
     },
-    async deleteTransaction(transactionId) {
-      if (!confirm("¿Estás seguro de que quieres eliminar esta transacción?")) {
-        return;
-      }
-
-      try {
-        await axiosData.delete(`/transactions/${transactionId}`);
-        this.transactions = this.transactions.filter(t => t._id !== transactionId);
-        alert("Transacción eliminada con éxito.");
-      } catch (error) {
-        console.error("Error al eliminar la transacción:", error);
-        alert("No se pudo eliminar la transacción.");
-      }
+    computed: {
+      ...mapState(useUserStore, ['userName']),
     },
-    editTransaction(transactionId) {
-      this.$router.push(`/edit/${transactionId}`);
+    async created() {
+      await this.reloadTransactions();
     },
-  },
-};
-</script>
+    methods: {
+      editTransaction(transactionId) {
+        this.$router.push({ name: 'EditTransaction', params: { id: transactionId } });
+      },
+      async reloadTransactions() {
+        try {
+          if (this.userName) {
+            const response = await axiosData.get(`/transactions?q=${JSON.stringify({ user_id: this.userName })}`);
+            this.transactions = response.data;
+          } else {
+            console.error('No hay un usuario logueado para cargar las transacciones.');
+          }
+        } catch (error) {
+          console.error('Error al cargar el historial de transacciones:', error);
+        }
+      },
+      async deleteTransaction(transactionId) {
+        if (window.confirm('¿Estás seguro de que quieres eliminar esta transacción?')) {
+          try {
+            await axiosData.delete(`/transactions/${transactionId}`);
+            alert('Transacción eliminada con éxito.');
+            await this.reloadTransactions();
+          } catch (error) {
+            console.error('Error al eliminar la transacción:', error);
+            alert('Error al eliminar la transacción. Por favor, intenta de nuevo.');
+          }
+        }
+      },
+    },
+  };
+  </script>
 
 <style scoped>
 .history {

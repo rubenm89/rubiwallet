@@ -92,9 +92,9 @@ export default {
     },
     async handleTransaction() {
       const userStore = useUserStore();
-      const userId = userStore.userName;
+      const userName = userStore.userName;
 
-      if (!userId) {
+      if (!userName) {
         alert("Error: No se ha identificado al usuario. Por favor, inicie sesión de nuevo.");
         return;
       }
@@ -105,7 +105,7 @@ export default {
       }
 
       const transactionData = {
-        user_id: userId,
+        user_id: userName,
         action: this.transactionType,
         crypto_code: this.selectedCrypto,
         crypto_amount: this.transactionQuantity.toString(),

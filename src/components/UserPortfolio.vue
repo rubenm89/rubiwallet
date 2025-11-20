@@ -69,11 +69,11 @@ export default {
   methods: {
     async fetchUserPortfolio() {
       const userStore = useUserStore();
-      const userId = userStore.userName;
-      if (!userId) return;
+      const userName = userStore.userName;
+      if (!userName) return;
 
       try {
-        const response = await axiosData.get(`/transactions?q=${JSON.stringify({ user_id: userId })}`);
+        const response = await axiosData.get(`/transactions?q=${JSON.stringify({ user_id: userName })}`);
         const transactions = response.data;
         const portfolio = {};
 

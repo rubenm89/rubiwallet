@@ -14,9 +14,9 @@ export default {
     TransactionHistory,
   },
   computed: {
-    userId() {
+    userName() {
       const userStore = useUserStore();
-      return userStore.userId; // Obtiene el ID del usuario logueado desde Pinia
+      return userStore.userName; // Obtiene el usuario logueado desde Pinia
     },
   },
 };
