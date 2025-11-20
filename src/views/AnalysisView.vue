@@ -53,11 +53,11 @@ export default {
   methods: {
     async calculateInvestmentResults() {
       const userStore = useUserStore();
-      const userId = userStore.userName;
-      if (!userId) return;
+      const userName = userStore.userName;
+      if (!userName) return;
 
       try {
-        const transactionsResponse = await axiosData.get(`/transactions?q=${JSON.stringify({ user_id: userId })}`);
+        const transactionsResponse = await axiosData.get(`/transactions?q=${JSON.stringify({ user_id: userName })}`);
         const transactions = transactionsResponse.data;
 
         const groupedByCrypto = transactions.reduce((acc, trx) => {
