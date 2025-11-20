@@ -25,7 +25,7 @@ export default {
     const isLoggedIn = computed(() => !!userStore.userName);
 
     const showNav = computed(() => {
-      const hiddenRoutes = ['home', 'login', 'about'];
+      const hiddenRoutes = ['home', 'login'];
       return isLoggedIn.value && !hiddenRoutes.includes(route.name);
     });
 
