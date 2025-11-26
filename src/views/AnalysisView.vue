@@ -1,7 +1,7 @@
 <template>
   <div class="analysis-view">
     <h1>Análisis de Inversiones</h1>
-    <table v-if="!isLoading">
+    <table v-if="!isAnalysisLoading">
       <thead>
         <tr>
           <th class="logo-col"></th>
@@ -31,17 +31,12 @@
 
 <script>
 import { useUserStore } from '@/stores/userStore';
-import { axiosData, getCryptoPrice } from '../service/axios';
+import { mapState, mapActions } from 'pinia';
 
 export default {
   name: 'AnalysisView',
-  data() {
-    return {
-      analysisResults: [],
-      isLoading: true,
-    };
-  },
   computed: {
+    ...mapState(useUserStore, ['analysisResults', 'isAnalysisLoading']),
     cryptoLogos() {
       return {
         btc: require('@/assets/bitcoin-logo.png'),
@@ -51,88 +46,10 @@ export default {
     },
   },
   methods: {
-    async calculateInvestmentResults() {
-      const userStore = useUserStore();
-      const userName = userStore.userName;
-      if (!userName) return;
-
-      try {
-        const transactionsResponse = await axiosData.get(`/transactions?q=${JSON.stringify({ user_id: userName })}`);
-        const transactions = transactionsResponse.data;
-
-        const groupedByCrypto = transactions.reduce((acc, trx) => {
-          if (!acc[trx.crypto_code]) {
-            acc[trx.crypto_code] = [];
-          }
-          acc[trx.crypto_code].push(trx);
-          return acc;
-        }, {});
-
-        const results = [];
-        const cryptoCodes = Object.keys(groupedByCrypto);
-
-        const prices = {};
-        for (const code of cryptoCodes) {
-          try {
-            const priceData = await getCryptoPrice('binance', code, 'ars', 1);
-            prices[code] = priceData.bid;
-          } catch (e) {
-            prices[code] = 0; // Assign 0 if price fetch fails for a crypto
-          }
-        }
-
-        for (const code of cryptoCodes) {
-          const txs = groupedByCrypto[code];
-          let totalMoneySpent = 0;
-          let totalMoneyGained = 0;
-          let totalAmountPurchased = 0;
-          let totalAmountSold = 0;
-
-          txs.forEach(trx => {
-            if (trx.action === 'purchase') {
-              totalMoneySpent += parseFloat(trx.money);
-              totalAmountPurchased += parseFloat(trx.crypto_amount);
-            } else if (trx.action === 'sale') {
-              totalMoneyGained += parseFloat(trx.money);
-              totalAmountSold += parseFloat(trx.crypto_amount);
-            }
-          });
-
-          const currentHolding = totalAmountPurchased - totalAmountSold;
-          let finalResult = 0;
-          let currentValueOrRealized = 0;
-          let status = 'Vendido';
-
-          if (currentHolding < 0.000001) {
-            finalResult = totalMoneyGained - totalMoneySpent;
-            currentValueOrRealized = totalMoneyGained;
-          } else {
-            const currentValue = currentHolding * (prices[code] || 0);
-            finalResult = (currentValue + totalMoneyGained) - totalMoneySpent;
-            currentValueOrRealized = currentValue + totalMoneyGained;
-            status = 'En Cartera';
-          }
-
-          results.push({
-            crypto: code,
-            totalInvested: totalMoneySpent,
-            currentValueOrRealized: currentValueOrRealized,
-            result: finalResult,
-            status: status,
-          });
-        }
-
-        this.analysisResults = results;
-      } catch (error) {
-        console.error("Error al calcular el análisis de inversiones:", error);
-        alert("No se pudo realizar el análisis.");
-      } finally {
-        this.isLoading = false;
-      }
-    },
+    ...mapActions(useUserStore, ['fetchAnalysis']),
   },
   mounted() {
-    this.calculateInvestmentResults();
+    this.fetchAnalysis();
   },
 };
 </script>

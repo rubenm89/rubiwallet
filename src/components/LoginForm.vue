@@ -8,7 +8,7 @@
       <input type="password" id="password" v-model="password" placeholder="Ingrese su contraseña" required/>
       
       <button type="submit">Ingresar</button>
-      <p v-show="errorMessage" style="color: red">{{ errorMessage }}</p>
+      <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
     </form>
   </section>    
 </template>
@@ -72,10 +72,11 @@ button {
   width: 100%;
   box-sizing: border-box;
 }
-p[style*="color: red"] {
+.error-message {
   grid-column: 1 / -1;
   text-align: center;
   margin: 0;
+  color: red;
 }
 button:hover {
   background-color: #0056b3;

@@ -1,7 +1,8 @@
 <template>
   <section class="user-portfolio">
     <h2>Tus Criptomonedas</h2>
-    <table v-if="hasCrypto">
+    <div v-if="loading">Cargando portafolio...</div>
+    <table v-else-if="hasCrypto">
       <thead>
         <tr>
           <th class="logo-col"></th>
@@ -12,7 +13,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(cantidad, cripto) in userCrypto" :key="cripto">
+        <tr v-for="(cantidad, cripto) in portfolio" :key="cripto">
           <td><img :src="cryptoLogos[cripto]" :alt="cripto" class="crypto-logo"></td>
           <td>{{ cripto.charAt(0).toUpperCase() + cripto.slice(1) }}</td>
           <td>{{ cantidad.toFixed(6) }}</td>
@@ -32,28 +33,20 @@
 </template>
 
 <script>
-import { axiosData } from '../service/axios';
+import { mapState } from 'pinia';
 import { useUserStore } from '@/stores/userStore';
+import { useCryptoStore } from '@/stores/cryptoStore';
 
 export default {
   name: 'UserPortfolio',
-  props: {
-    prices: {
-      type: Object,
-      required: true,
-    },
-  },
-  data() {
-    return {
-      userCrypto: {},
-    };
-  },
   computed: {
+    ...mapState(useUserStore, ['portfolio', 'loading']),
+    ...mapState(useCryptoStore, ['prices']),
     hasCrypto() {
-      return Object.keys(this.userCrypto).length > 0;
+      return Object.keys(this.portfolio).length > 0;
     },
     totalPortfolioValue() {
-      return Object.entries(this.userCrypto).reduce((total, [crypto, amount]) => {
+      return Object.entries(this.portfolio).reduce((total, [crypto, amount]) => {
         const price = this.prices[crypto]?.bid || 0;
         return total + (amount * price);
       }, 0);
@@ -65,45 +58,6 @@ export default {
         ltc: require('@/assets/litecoin-logo.png'),
       };
     },
-  },
-  methods: {
-    async fetchUserPortfolio() {
-      const userStore = useUserStore();
-      const userName = userStore.userName;
-      if (!userName) return;
-
-      try {
-        const response = await axiosData.get(`/transactions?q=${JSON.stringify({ user_id: userName })}`);
-        const transactions = response.data;
-        const portfolio = {};
-
-        for (const trx of transactions) {
-          const amount = parseFloat(trx.crypto_amount);
-          if (!portfolio[trx.crypto_code]) {
-            portfolio[trx.crypto_code] = 0;
-          }
-          if (trx.action === 'purchase') {
-            portfolio[trx.crypto_code] += amount;
-          } else if (trx.action === 'sale') {
-            portfolio[trx.crypto_code] -= amount;
-          }
-        }
-
-        for (const crypto in portfolio) {
-          if (portfolio[crypto] <= 0.000001) {
-            delete portfolio[crypto];
-          }
-        }
-
-        this.userCrypto = portfolio;
-      } catch (error) {
-        console.error("Error al obtener el portafolio del usuario:", error);
-        alert("No se pudo cargar tu portafolio de criptomonedas.");
-      }
-    },
-  },
-  mounted() {
-    this.fetchUserPortfolio();
   },
 };
 </script>
