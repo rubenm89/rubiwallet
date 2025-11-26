@@ -1,7 +1,7 @@
 <template>
   <section class="history">
     <h1>Historial de Movimientos</h1>
-    <table v-if="transactions.length">
+    <table v-if="sortedTransactions .length">
       <thead>
         <tr>
           <th>Fecha</th>
@@ -13,9 +13,9 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="transaction in transactions" :key="transaction._id">
+        <tr v-for="transaction in sortedTransactions " :key="transaction._id">
           <td>{{ new Date(transaction.datetime).toLocaleString('es-AR') }}</td>
-          <td>{{ transaction.action === 'purchase' ? 'Compra' : 'Venta' }}</td>
+          <td :class="transaction.action === 'purchase' ? 'purchase-text' : 'sale-text'">{{ transaction.action === 'purchase' ? 'Compra' : 'Venta' }}</td>
           <td>{{ transaction.crypto_code.toUpperCase() }}</td>
           <td>{{ parseFloat(transaction.crypto_amount).toFixed(6) }}</td>
           <td>${{ parseFloat(transaction.money).toFixed(2) }}</td>
@@ -32,7 +32,7 @@
 
 <script>
   import { axiosData } from '@/service/axios';
-  import { mapState } from 'pinia';
+  import { mapState, mapActions } from 'pinia';
   import { useUserStore } from '@/stores/userStore';
   
   export default {
@@ -44,11 +44,18 @@
     },
     computed: {
       ...mapState(useUserStore, ['userName']),
+      sortedTransactions() {
+        // Ordena las transacciones por fecha, de más reciente a más antigua
+        return [...this.transactions].sort((a, b) => {
+          return new Date(b.datetime) - new Date(a.datetime);
+        });
+      }
     },
     async created() {
       await this.reloadTransactions();
     },
     methods: {
+      ...mapActions(useUserStore, ['fetchUserPortfolio']),
       editTransaction(transactionId) {
         this.$router.push({ name: 'EditTransaction', params: { id: transactionId } });
       },
@@ -70,6 +77,7 @@
             await axiosData.delete(`/transactions/${transactionId}`);
             alert('Transacción eliminada con éxito.');
             await this.reloadTransactions();
+            await this.fetchUserPortfolio(); // Recalculate portfolio
           } catch (error) {
             console.error('Error al eliminar la transacción:', error);
             alert('Error al eliminar la transacción. Por favor, intenta de nuevo.');
@@ -122,5 +130,15 @@ th {
 .btn-delete {
   background-color: #D0021B;
   color: white;
+}
+
+.purchase-text {
+  color: #2E7D32;
+  font-weight: bold;
+}
+
+.sale-text {
+  color: #C62828;
+  font-weight: bold;
 }
 </style>

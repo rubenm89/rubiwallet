@@ -1,7 +1,11 @@
 <template>
   <div class="dashboard-stats">
-    <CryptoPriceDisplay :prices="prices" />
-    <UserPortfolio :prices="prices" />
+    <div v-if="loading">Cargando precios...</div>
+    <div v-else-if="error">{{ error }}</div>
+    <template v-else>
+      <CryptoPriceDisplay :prices="prices" />
+      <UserPortfolio />
+    </template>
 
     <section class="actions">
       <h2>Acciones</h2>
@@ -14,7 +18,8 @@
 </template>
 
 <script>
-import { getCryptoPrice } from '../service/axios';
+import { mapState } from 'pinia';
+import { useCryptoStore } from '@/stores/cryptoStore';
 import CryptoPriceDisplay from './CryptoPriceDisplay.vue';
 import UserPortfolio from './UserPortfolio.vue';
 
@@ -23,10 +28,8 @@ export default {
     CryptoPriceDisplay,
     UserPortfolio,
   },
-  data() {
-    return {
-      prices: {},
-    };
+  computed: {
+    ...mapState(useCryptoStore, ['prices', 'loading', 'error']),
   },
   methods: {
     goToHistory() {
@@ -35,26 +38,20 @@ export default {
     goToOperar() {
       this.$router.push("/operar");
     },
-    async fetchCryptoPrices() {
-      try {
-        const availableCryptos = ["btc", "eth", "ltc"];
-        const prices = {};
-        for (const crypto of availableCryptos) {
-          const data = await getCryptoPrice("binance", crypto, "ars", 1);
-          prices[crypto] = {
-            ask: data.ask,
-            bid: data.bid,
-          };
-        }
-        this.prices = prices;
-      } catch (error) {
-        console.error("Error al obtener los precios de las criptomonedas:", error);
-      }
+    startUpdates() {
+      const cryptoStore = useCryptoStore();
+      cryptoStore.startPriceUpdates();
     },
+    stopUpdates() {
+      const cryptoStore = useCryptoStore();
+      cryptoStore.stopPriceUpdates();
+    }
   },
   mounted() {
-    this.fetchCryptoPrices();
-    setInterval(this.fetchCryptoPrices, 30000);
+    this.startUpdates();
+  },
+  beforeUnmount() {
+    this.stopUpdates();
   },
 };
 </script>

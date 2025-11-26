@@ -20,7 +20,7 @@
 
 <style>
 .logo { 
-  width: 500px; /* Cambia el tamaño a lo que necesites */
+  width: 400px; /* Cambia el tamaño a lo que necesites */
   height: auto; /* Mantén la proporción de la imagen */
   border-radius: 50%; /* Hace que la imagen sea redonda */
   object-fit: cover; /* Asegura que la imagen se recorte para ajustarse al círculo */

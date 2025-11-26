@@ -1,7 +1,7 @@
 <template>
     <div class="dashboard">     
-      <h1>Bienvenido, <p v-if="userStore.userName">{{ userStore.userName }}</p>
-        <p v-else>visitante</p></h1>    
+      <h1>Bienvenido, <span v-if="userStore.userName">{{ userStore.userName }}</span>
+        <span v-else>visitante</span></h1>    
       <DashboardStats />
     </div>
 </template>  

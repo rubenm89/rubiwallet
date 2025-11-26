@@ -16,7 +16,7 @@
     <form @submit.prevent="handleTransaction">
       <div class="form-group">
         <label for="crypto">Criptomoneda</label>
-        <select v-model="selectedCrypto" id="crypto" @change="updateCryptoPrice" required>
+        <select v-model="selectedCrypto" id="crypto" required>
           <option v-for="crypto in availableCryptos" :key="crypto" :value="crypto">
             {{ crypto.toUpperCase() }}
           </option>
@@ -25,6 +25,9 @@
 
       <div v-if="currentPrice" class="price-display">
         <span>Precio de {{ transactionType === 'purchase' ? 'Compra' : 'Venta' }}: <strong>${{ transactionPrice.toFixed(2) }} ARS</strong></span>
+      </div>
+      <div v-else class="price-display">
+        <span>Cargando precio...</span>
       </div>
 
       <div class="form-row">
@@ -38,44 +41,39 @@
         </div>
       </div>
 
-      <button type="submit" class="submit-btn">Realizar Transacción</button>
+      <button type="submit" class="submit-btn" :disabled="!currentPrice">Realizar Transacción</button>
     </form>
   </div>
 </template>
 
 <script>
-import { getCryptoPrice, axiosData } from '../service/axios';
+import { axiosData } from '../service/axios';
 import { useUserStore } from '@/stores/userStore';
+import { useCryptoStore } from '@/stores/cryptoStore';
+import { mapState } from 'pinia';
 
 export default {
   name: 'TransactionForm',
   data() {
     return {
-      availableCryptos: ["btc", "eth", "ltc"],
       selectedCrypto: "btc",
       transactionQuantity: null,
       transactionType: "purchase",
       transactionMoney: null,
-      currentPrice: null,
     };
   },
   computed: {
+    ...mapState(useCryptoStore, ['availableCryptos']),
+    currentPrice() {
+      const cryptoStore = useCryptoStore();
+      return cryptoStore.getPrice(this.selectedCrypto);
+    },
     transactionPrice() {
       if (!this.currentPrice) return 0;
       return this.transactionType === 'purchase' ? this.currentPrice.ask : this.currentPrice.bid;
     }
   },
   methods: {
-    async updateCryptoPrice() {
-      try {
-        const data = await getCryptoPrice("binance", this.selectedCrypto, "ars", 1);
-        this.currentPrice = { ask: data.ask, bid: data.bid };
-        this.updateMoney();
-      } catch (error) {
-        console.error("Error al obtener la cotización:", error);
-        alert("No se pudo obtener el precio de la criptomoneda.");
-      }
-    },
     updateMoney() {
       if (this.transactionQuantity > 0 && this.transactionPrice > 0) {
         this.transactionMoney = parseFloat((this.transactionQuantity * this.transactionPrice).toFixed(2));
@@ -92,9 +90,7 @@ export default {
     },
     async handleTransaction() {
       const userStore = useUserStore();
-      const userName = userStore.userName;
-
-      if (!userName) {
+      if (!userStore.userName) {
         alert("Error: No se ha identificado al usuario. Por favor, inicie sesión de nuevo.");
         return;
       }
@@ -104,8 +100,18 @@ export default {
         return;
       }
 
+      // --- VALIDATION LOGIC ---
+      if (this.transactionType === 'sale') {
+        const holding = userStore.getHolding(this.selectedCrypto);
+        if (this.transactionQuantity > holding) {
+          alert(`No tienes suficientes fondos. Saldo actual: ${holding.toFixed(6)} ${this.selectedCrypto.toUpperCase()}.`);
+          return;
+        }
+      }
+      // --- END VALIDATION ---
+
       const transactionData = {
-        user_id: userName,
+        user_id: userStore.userName,
         action: this.transactionType,
         crypto_code: this.selectedCrypto,
         crypto_amount: this.transactionQuantity.toString(),
@@ -116,6 +122,10 @@ export default {
       try {
         await axiosData.post("/transactions", transactionData);
         alert("Transacción registrada con éxito.");
+        
+        // Update user portfolio in the store
+        await userStore.fetchUserPortfolio();
+
         this.$emit('transaction-completed'); 
         this.transactionQuantity = null;
         this.transactionMoney = null;
@@ -128,10 +138,19 @@ export default {
   watch: {
     transactionType() {
       this.updateMoney();
+    },
+    selectedCrypto() {
+      // When the crypto changes, recalculate money if quantity is set
+      this.updateMoney();
     }
   },
   mounted() {
-    this.updateCryptoPrice();
+    const cryptoStore = useCryptoStore();
+    // Fetch prices if they are not already loaded.
+    // The dashboard might have already started the update interval.
+    if (Object.keys(cryptoStore.prices).length === 0) {
+      cryptoStore.fetchPrices();
+    }
   },
 };
 </script>

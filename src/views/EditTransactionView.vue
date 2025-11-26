@@ -1,7 +1,8 @@
 <template>
   <div class="edit-transaction-view">
     <h1>Editar Transacción</h1>
-    <form v-if="transaction" @submit.prevent="updateTransaction">
+    <p v-if="loading && !transaction">Cargando transacción...</p>
+    <form v-if="transaction" @submit.prevent="saveChanges">
       <label for="crypto">Criptomoneda:</label>
       <input id="crypto" :value="transaction.crypto_code.toUpperCase()" disabled />
 
@@ -18,64 +19,51 @@
       <input id="datetime" type="datetime-local" v-model="transaction.datetime" required />
 
       <div class="form-actions">
-        <button type="submit" class="btn-save">Guardar Cambios</button>
+        <button type="submit" class="btn-save" :disabled="loading">
+          {{ loading ? 'Guardando...' : 'Guardar Cambios' }}
+        </button>
         <button type="button" @click="cancel" class="btn-cancel">Cancelar</button>
       </div>
     </form>
-    <p v-else>Cargando transacción...</p>
   </div>
 </template>
 
 <script>
-import { axiosData } from '../service/axios';
+import { mapActions, mapState, mapWritableState } from 'pinia';
+import { useUserStore } from '@/stores/userStore';
 
 export default {
   name: 'EditTransactionView',
-  data() {
-    return {
-      transaction: null,
-    };
+  computed: {
+    ...mapState(useUserStore, ['loading']),
+    ...mapWritableState(useUserStore, {
+      transaction: 'currentTransaction',
+    }),
   },
   methods: {
-    async fetchTransaction() {
-      const transactionId = this.$route.params.id;
+    ...mapActions(useUserStore, ['fetchTransaction', 'updateTransaction']),
+    async saveChanges() {
       try {
-        const response = await axiosData.get(`/transactions/${transactionId}`);
-        // The API returns datetime in ISO format, need to format for datetime-local input
-        const apiDate = new Date(response.data.datetime);
-        // Adjust for local timezone offset
-        const timezoneOffset = apiDate.getTimezoneOffset() * 60000; //offset in milliseconds
-        const localDate = new Date(apiDate.getTime() - timezoneOffset);
-        response.data.datetime = localDate.toISOString().slice(0, 16);
-        this.transaction = response.data;
-      } catch (error) {
-        console.error("Error al obtener la transacción:", error);
-        alert("No se pudo cargar la información de la transacción.");
-      }
-    },
-    async updateTransaction() {
-      const transactionId = this.transaction._id;
-      const dataToUpdate = {
-        crypto_amount: this.transaction.crypto_amount.toString(),
-        money: this.transaction.money.toString(),
-        datetime: new Date(this.transaction.datetime).toISOString(),
-      };
-
-      try {
-        await axiosData.patch(`/transactions/${transactionId}`, dataToUpdate);
+        await this.updateTransaction(this.transaction);
         alert("Transacción actualizada con éxito.");
         this.$router.push('/history');
       } catch (error) {
-        console.error("Error al actualizar la transacción:", error);
-        alert("No se pudo guardar los cambios.");
+        console.error(error.message);
+        alert("Error al actualizar la transacción: " + error.message);
       }
     },
     cancel() {
+      this.transaction = null; // Limpiar el estado antes de salir
       this.$router.push('/history');
     },
   },
   mounted() {
-    this.fetchTransaction();
+    const transactionId = this.$route.params.id;
+    this.fetchTransaction(transactionId);
+  },
+  beforeUnmount() {
+    // Limpiar la transacción del store cuando el componente se destruye
+    this.transaction = null;
   },
 };
 </script>
@@ -127,5 +115,10 @@ button {
   border: none;
   border-radius: 5px;
   cursor: pointer;
+}
+
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
 }
 </style>
