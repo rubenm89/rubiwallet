@@ -32,7 +32,6 @@
 
 <script>
   import { mapState, mapActions } from 'pinia';
-  import { useUserStore } from '@/stores/userStore';
   import { useTransactionStore } from '@/stores/transactionStore';
   
   export default {
@@ -44,7 +43,6 @@
       this.fetchTransactions();
     },
     methods: {
-      ...mapActions(useUserStore, ['fetchUserPortfolio']),
       ...mapActions(useTransactionStore, ['fetchTransactions', 'removeTransaction']),
 
       editTransaction(transactionId) {
@@ -56,8 +54,6 @@
           try {
             await this.removeTransaction(transactionId);
             alert('Transacción eliminada con éxito.');
-            // Recalcula el portafolio para reflejar la eliminación
-            await this.fetchUserPortfolio();
           } catch (error) {
             alert('Error al eliminar la transacción. Por favor, intenta de nuevo.');
           }

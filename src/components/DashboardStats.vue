@@ -18,8 +18,9 @@
 </template>
 
 <script>
-import { mapState } from 'pinia';
+import { mapState, mapActions } from 'pinia';
 import { useCryptoStore } from '@/stores/cryptoStore';
+import { useTransactionStore } from '@/stores/transactionStore';
 import CryptoPriceDisplay from './CryptoPriceDisplay.vue';
 import UserPortfolio from './UserPortfolio.vue';
 
@@ -32,6 +33,7 @@ export default {
     ...mapState(useCryptoStore, ['prices', 'loading', 'error']),
   },
   methods: {
+    ...mapActions(useTransactionStore, ['fetchTransactions']),
     goToHistory() {
       this.$router.push("/history");
     },
@@ -49,6 +51,7 @@ export default {
   },
   mounted() {
     this.startUpdates();
+    this.fetchTransactions();
   },
   beforeUnmount() {
     this.stopUpdates();

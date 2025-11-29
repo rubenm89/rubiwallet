@@ -1,7 +1,7 @@
 <template>
   <div class="edit-transaction-view">
     <h1>Editar Transacción</h1>
-    <p v-if="loading && !transaction">Cargando transacción...</p>
+    <p v-if="loading">Cargando transacción...</p>
     <form v-if="transaction" @submit.prevent="saveChanges">
       <label for="crypto">Criptomoneda:</label>
       <input id="crypto" :value="transaction.crypto_code.toUpperCase()" disabled />
@@ -29,41 +29,48 @@
 </template>
 
 <script>
-import { mapActions, mapState, mapWritableState } from 'pinia';
-import { useUserStore } from '@/stores/userStore';
+import { mapActions, mapState } from 'pinia';
+import { useTransactionStore } from '@/stores/transactionStore';
 
 export default {
   name: 'EditTransactionView',
+  data() {
+    return {
+      transaction: null, // Estado local para la transacción en edición
+    };
+  },
   computed: {
-    ...mapState(useUserStore, ['loading']),
-    ...mapWritableState(useUserStore, {
-      transaction: 'currentTransaction',
-    }),
+    ...mapState(useTransactionStore, ['loading', 'currentTransaction']),
+  },
+  watch: {
+    currentTransaction(newTx) {
+      if (newTx) {
+        // Clonar para evitar la mutación directa del estado de Pinia
+        this.transaction = { ...newTx };
+      }
+    }
   },
   methods: {
-    ...mapActions(useUserStore, ['fetchTransaction', 'updateTransaction']),
+    ...mapActions(useTransactionStore, ['updateTransaction', 'getTransactionById']),
     async saveChanges() {
+      if (!this.transaction) return;
       try {
-        await this.updateTransaction(this.transaction);
+        const { _id, crypto_amount, money, datetime } = this.transaction;
+        await this.updateTransaction(_id, { crypto_amount, money, datetime });
         alert("Transacción actualizada con éxito.");
         this.$router.push('/history');
       } catch (error) {
-        console.error(error.message);
+        console.error("Error al guardar cambios en la vista:", error);
         alert("Error al actualizar la transacción: " + error.message);
       }
     },
     cancel() {
-      this.transaction = null; // Limpiar el estado antes de salir
       this.$router.push('/history');
     },
   },
-  mounted() {
+  created() {
     const transactionId = this.$route.params.id;
-    this.fetchTransaction(transactionId);
-  },
-  beforeUnmount() {
-    // Limpiar la transacción del store cuando el componente se destruye
-    this.transaction = null;
+    this.getTransactionById(transactionId);
   },
 };
 </script>
