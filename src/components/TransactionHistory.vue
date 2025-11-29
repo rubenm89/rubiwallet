@@ -31,55 +31,34 @@
 </template>
 
 <script>
-  import { axiosData } from '@/service/axios';
   import { mapState, mapActions } from 'pinia';
   import { useUserStore } from '@/stores/userStore';
+  import { useTransactionStore } from '@/stores/transactionStore';
   
   export default {
     name: 'TransactionHistory',
-    data() {
-      return {
-        transactions: [],
-      };
-    },
     computed: {
-      ...mapState(useUserStore, ['userName']),
-      sortedTransactions() {
-        // Ordena las transacciones por fecha, de más reciente a más antigua
-        return [...this.transactions].sort((a, b) => {
-          return new Date(b.datetime) - new Date(a.datetime);
-        });
-      }
+      ...mapState(useTransactionStore, ['sortedTransactions', 'loading', 'error']),
     },
     async created() {
-      await this.reloadTransactions();
+      this.fetchTransactions();
     },
     methods: {
       ...mapActions(useUserStore, ['fetchUserPortfolio']),
+      ...mapActions(useTransactionStore, ['fetchTransactions', 'removeTransaction']),
+
       editTransaction(transactionId) {
         this.$router.push({ name: 'EditTransaction', params: { id: transactionId } });
       },
-      async reloadTransactions() {
-        try {
-          if (this.userName) {
-            const response = await axiosData.get(`/transactions?q=${JSON.stringify({ user_id: this.userName })}`);
-            this.transactions = response.data;
-          } else {
-            console.error('No hay un usuario logueado para cargar las transacciones.');
-          }
-        } catch (error) {
-          console.error('Error al cargar el historial de transacciones:', error);
-        }
-      },
+      
       async deleteTransaction(transactionId) {
         if (window.confirm('¿Estás seguro de que quieres eliminar esta transacción?')) {
           try {
-            await axiosData.delete(`/transactions/${transactionId}`);
+            await this.removeTransaction(transactionId);
             alert('Transacción eliminada con éxito.');
-            await this.reloadTransactions();
-            await this.fetchUserPortfolio(); // Recalculate portfolio
+            // Recalcula el portafolio para reflejar la eliminación
+            await this.fetchUserPortfolio();
           } catch (error) {
-            console.error('Error al eliminar la transacción:', error);
             alert('Error al eliminar la transacción. Por favor, intenta de nuevo.');
           }
         }
