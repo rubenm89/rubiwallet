@@ -30,13 +30,13 @@
 </template>
 
 <script>
-import { useUserStore } from '@/stores/userStore';
+import { useTransactionStore } from '@/stores/transactionStore';
 import { mapState, mapActions } from 'pinia';
 
 export default {
   name: 'AnalysisView',
   computed: {
-    ...mapState(useUserStore, ['analysisResults', 'isAnalysisLoading']),
+    ...mapState(useTransactionStore, ['analysisResults', 'isAnalysisLoading']),
     cryptoLogos() {
       return {
         btc: require('@/assets/bitcoin-logo.png'),
@@ -46,7 +46,7 @@ export default {
     },
   },
   methods: {
-    ...mapActions(useUserStore, ['fetchAnalysis']),
+    ...mapActions(useTransactionStore, ['fetchAnalysis']),
   },
   mounted() {
     this.fetchAnalysis();

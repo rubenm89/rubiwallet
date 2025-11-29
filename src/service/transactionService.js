@@ -29,7 +29,8 @@ export const transactionService = {
     };
 
     try {
-      await axiosData.patch(`/transactions/${id}`, dataToUpdate);
+      const response = await axiosData.patch(`/transactions/${id}`, dataToUpdate);
+      return response.data;
     } catch (error) {
       console.error("Error al actualizar la transacción:", error);
       throw new Error("No se pudo guardar los cambios.");

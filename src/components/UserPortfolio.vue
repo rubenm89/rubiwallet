@@ -36,12 +36,14 @@
 import { mapState } from 'pinia';
 import { useUserStore } from '@/stores/userStore';
 import { useCryptoStore } from '@/stores/cryptoStore';
+import { useTransactionStore } from '@/stores/transactionStore';
 
 export default {
   name: 'UserPortfolio',
   computed: {
-    ...mapState(useUserStore, ['portfolio', 'loading']),
+    ...mapState(useUserStore, ['portfolio']),
     ...mapState(useCryptoStore, ['prices']),
+    ...mapState(useTransactionStore, ['loading']),
     hasCrypto() {
       return Object.keys(this.portfolio).length > 0;
     },
