@@ -47,9 +47,9 @@
 </template>
 
 <script>
-import { axiosData } from '../service/axios';
 import { useUserStore } from '@/stores/userStore';
 import { useCryptoStore } from '@/stores/cryptoStore';
+import { useTransactionStore } from '@/stores/transactionStore';
 import { mapState } from 'pinia';
 
 export default {
@@ -90,6 +90,8 @@ export default {
     },
     async handleTransaction() {
       const userStore = useUserStore();
+      const transactionStore = useTransactionStore();
+
       if (!userStore.userName) {
         alert("Error: No se ha identificado al usuario. Por favor, inicie sesión de nuevo.");
         return;
@@ -100,7 +102,6 @@ export default {
         return;
       }
 
-      // --- VALIDATION LOGIC ---
       if (this.transactionType === 'sale') {
         const holding = userStore.getHolding(this.selectedCrypto);
         if (this.transactionQuantity > holding) {
@@ -108,7 +109,6 @@ export default {
           return;
         }
       }
-      // --- END VALIDATION ---
 
       const transactionData = {
         user_id: userStore.userName,
@@ -120,12 +120,9 @@ export default {
       };
 
       try {
-        await axiosData.post("/transactions", transactionData);
+        await transactionStore.addTransaction(transactionData);
         alert("Transacción registrada con éxito.");
         
-        // Update user portfolio in the store
-        await userStore.fetchUserPortfolio();
-
         this.$emit('transaction-completed'); 
         this.transactionQuantity = null;
         this.transactionMoney = null;
@@ -140,14 +137,11 @@ export default {
       this.updateMoney();
     },
     selectedCrypto() {
-      // When the crypto changes, recalculate money if quantity is set
       this.updateMoney();
     }
   },
   mounted() {
     const cryptoStore = useCryptoStore();
-    // Fetch prices if they are not already loaded.
-    // The dashboard might have already started the update interval.
     if (Object.keys(cryptoStore.prices).length === 0) {
       cryptoStore.fetchPrices();
     }
