@@ -17,10 +17,7 @@ export default {
   },
   setup() {
     const userStore = useUserStore();
-    
-    console.log("Estado del store en DashboardView:", userStore);      
-    console.log("Valor de userStore.userName:", userStore.userName);
-    
+        
     return { userStore };
   }
 };

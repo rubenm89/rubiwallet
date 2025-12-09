@@ -44,9 +44,9 @@ export const useUserStore = defineStore('user', {
     logout() {
       const transactionStore = useTransactionStore();
       this.userName = null;
-      // Clear transactions when logging out
       transactionStore.transactions = [];
       transactionStore.analysisResults = [];
+      transactionStore.currentTransaction = null;
     },
   },
 });

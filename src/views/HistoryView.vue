@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import { useUserStore } from '@/stores/userStore';
+
 import TransactionHistory from '@/components/TransactionHistory.vue';
 
 export default {
@@ -13,11 +13,6 @@ export default {
   components: { 
     TransactionHistory,
   },
-  computed: {
-    userName() {
-      const userStore = useUserStore();
-      return userStore.userName; // Obtiene el usuario logueado desde Pinia
-    },
-  },
+
 };
 </script>

@@ -46,7 +46,7 @@ export const useTransactionStore = defineStore('transactions', {
       try {
         this.currentTransaction = await transactionService.getTransactionById(id);
       } catch (error) {
-        console.error("Error fetching transaction:", error);
+        console.error("Error, transaccion no encontrada - ", error);
         this.currentTransaction = null;
       } finally {
         this.loading = false;
@@ -113,9 +113,9 @@ export const useTransactionStore = defineStore('transactions', {
       const cryptoStore = useCryptoStore();
 
       try {
-        // Ensure user portfolio and crypto prices are loaded
-        await this.fetchTransactions();
-        await cryptoStore.fetchPrices();
+                
+        await this.fetchTransactions();// recargar el historial
+        await cryptoStore.fetchPrices();//obtener precios actulizados
         
         const transactions = this.transactions;
         const prices = cryptoStore.prices;
