@@ -3,7 +3,7 @@
         <h1>RubiWallet</h1>
         <img src="../assets/LogoRubiwallet.webp" alt="LogoRubiwallet" class="logo" @click="goToLogin" >
         <br>
-        <p>Clik en la imagen para ingresar</p>
+        <p>Click en la imagen para ingresar</p>
     </div>  
 </template>
 
