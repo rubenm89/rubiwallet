@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { getCryptoPrice } from '../service/axios';
+import { getCryptoPrice } from '../service/cryptoService';
 
 export const useCryptoStore = defineStore('crypto', {
   state: () => ({
@@ -39,7 +39,7 @@ export const useCryptoStore = defineStore('crypto', {
     },
     startPriceUpdates() {
       if (this.priceUpdateInterval) {
-        clearInterval(this.priceUpdateInterval);
+        clearInterval(this.priceUpdateInterval);//limpiar si ya existe
       }
       this.fetchPrices(); // Obtener de inmediato
       this.priceUpdateInterval = setInterval(() => {

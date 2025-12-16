@@ -36,7 +36,7 @@ export default {
   name: 'EditTransactionForm',
   data() {
     return {
-      transaction: null, // Estado local para la transacción en edición
+      transaction: null, // Estado local para la transacción en edición separado del store
     };
   },
   computed: {

@@ -76,7 +76,7 @@ export const useTransactionStore = defineStore('transactions', {
         const updatedTransaction = await transactionService.updateTransaction(transactionId, transactionData);
 
         // Actualiza la transacción en el estado local para reflejar los cambios en la UI.
-        const index = this.transactions.findIndex(t => t._id === transactionId);
+        const index = this.transactions.findIndex(t => t._id === transactionId);//si no existe, devuelve -1
         if (index !== -1) {
           this.transactions[index] = updatedTransaction;
         }
@@ -148,17 +148,18 @@ export const useTransactionStore = defineStore('transactions', {
             }
           });
 
-          const currentHolding = totalAmountPurchased - totalAmountSold;
+          const currentHolding = totalAmountPurchased - totalAmountSold; //lo que tengo actualmente
+
           let finalResult = 0;
           let currentValueOrRealized = 0;
           let status = 'Vendido';
           
           const currentPrice = prices[code] ? prices[code].bid : 0;
 
-          if (currentHolding < 0.000001) {
+          if (currentHolding < 0.000001) { //si ya vendi todo
             finalResult = totalMoneyGained - totalMoneySpent;
             currentValueOrRealized = totalMoneyGained;
-          } else {
+          } else { //si todavia tengo en cartera
             const currentValue = currentHolding * currentPrice;
             finalResult = (currentValue + totalMoneyGained) - totalMoneySpent;
             currentValueOrRealized = currentValue + totalMoneyGained;

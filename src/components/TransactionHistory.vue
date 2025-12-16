@@ -39,7 +39,7 @@
     computed: {
       ...mapState(useTransactionStore, ['sortedTransactions', 'loading', 'error']),
     },
-    async created() {
+    created() {
       this.fetchTransactions();
     },
     methods: {

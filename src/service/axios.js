@@ -29,17 +29,4 @@ axiosQoutes.interceptors.response.use(
   }
 );
 
-// FUNCIÓN PARA OBTENER EL PRECIO DE CRIPTOMONEDAS
-export const getCryptoPrice = async (exchange, crypto, fiat, volume) => {
-  try {
-    const url = `https://criptoya.com/api/${exchange}/${crypto}/${fiat}/${volume}`;
-    console.log("URL generada:", `${url}`);  // <-- LOG DE LA URL COMPLETA
-    const response = await axiosQoutes.get(url);     
-    return response.data;    
-  } catch (error) {    
-    console.error("Error al obtener cotización:", error);
-    throw error;
-  }
-};
-
 export { axiosData, axiosQoutes };
