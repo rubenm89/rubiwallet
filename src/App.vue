@@ -45,9 +45,8 @@ export default {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
-  /* estos 3 son para ver que onda, sino lo borro */
-  min-height: 100vh; /* Asegura que el contenedor ocupe al menos toda la altura de la pantalla */
+  color: #2c3e50;  
+  min-height: 100vh; 
   display: flex;
   flex-direction: column;
 }
@@ -71,7 +70,7 @@ footer {
   text-align: center;
   padding: 20px 0;
   font-size: 14px;
-  margin-top: auto; /* Esto empuja el footer al final */
+  margin-top: auto; 
   width: 100%;
 }  
 footer p {
@@ -94,6 +93,6 @@ section {
   padding: 20px;
   margin-bottom: 20px;
   background-color: #e9e9e9;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Sombra suave */
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); 
 }
 </style>

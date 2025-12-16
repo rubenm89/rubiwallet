@@ -1,7 +1,9 @@
 <template>
     <div>
         <h1>RubiWallet</h1>
-        <img src="../assets/LogoRubiwallet.webp" alt="LogoRubiwallet" class="logo" @click="goToLogin" >
+        <RouterLink to="/login">
+            <img src="../assets/LogoRubiwallet.webp" alt="LogoRubiwallet" class="logo">
+        </RouterLink>
         <br>
         <p>Click en la imagen para ingresar</p>
     </div>  
@@ -10,28 +12,23 @@
 <script>
     export default {
         name: "HomePage", 
-        methods: {
-        goToLogin() {
-            this.$router.push('/login'); 
-            },  
-        }
     }
 </script>
 
 <style>
 .logo { 
-  width: 400px; /* Cambia el tamaño a lo que necesites */
-  height: auto; /* Mantén la proporción de la imagen */
-  border-radius: 50%; /* Hace que la imagen sea redonda */
-  object-fit: cover; /* Asegura que la imagen se recorte para ajustarse al círculo */
-  margin: 20px auto; /* Centra la imagen con margen */
-  display: block; /* Asegura que se comporte como un bloque */
-  cursor: pointer; /* Cambia el cursor al pasar sobre la imagen */
-  transition: transform 0.2s ease; /* Agrega una animación suave */
+  width: 400px; 
+  height: auto; 
+  border-radius: 50%; 
+  object-fit: cover; 
+  margin: 20px auto; 
+  display: block; 
+  cursor: pointer; 
+  transition: transform 0.2s ease; 
 }
 
 .logo:hover {
-  transform: scale(1.1); /* Aumenta ligeramente el tamaño al pasar el cursor */
+  transform: scale(1.1); 
 }
 
 </style>

@@ -12,7 +12,7 @@ export const useUserStore = defineStore('user', {
 
       transactionStore.transactions.forEach(trx => {
         const amount = parseFloat(trx.crypto_amount);
-        if (!newPortfolio[trx.crypto_code]) {
+        if (!newPortfolio[trx.crypto_code]) { //si la cripto no existe, la inicializo en 0
           newPortfolio[trx.crypto_code] = 0;
         }
 
@@ -23,7 +23,7 @@ export const useUserStore = defineStore('user', {
         }
       });
 
-      // Ensure no negative balances due to floating point inaccuracies
+      // si alguna cripto queda en negativo (por error), la pongo en 0
       for (const crypto in newPortfolio) {
         if (newPortfolio[crypto] < 0) {
           newPortfolio[crypto] = 0;
