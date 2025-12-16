@@ -8,7 +8,7 @@
   </nav>
   <router-view/>
   <footer>
-      <p>Laboratorio 3 - Cursado Intensivo - 2024</p>
+      <p>Rubiwallet · Laboratorio III · 2025 · Rubén Miguel</p>
   </footer>
 </template>
 
